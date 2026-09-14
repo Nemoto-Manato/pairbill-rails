@@ -1,0 +1,113 @@
+<% content_for :title, "ダッシュボード" %>
+<div class="container-app">
+  <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap">
+    <h1 class="h4 mb-0">ダッシュボード</h1>
+    <span class="text-muted"><%= @dashboard.year_month_label %> の集計</span>
+  </div>
+
+  <div class="card card-summary p-3 mb-4">
+    <span class="text-muted small">ペア相手</span>
+    <% if @dashboard.partner_display_name %>
+      <span class="h5 mb-0"><%= @dashboard.partner_display_name %></span>
+    <% else %>
+      <span class="h5 mb-0 text-muted">未参加</span>
+    <% end %>
+  </div>
+
+  <div class="row g-3 mb-4">
+    <div class="col-6 col-md-3">
+      <div class="card card-summary p-3 h-100">
+        <span class="text-muted small">自分が請求している額（当月・承認済み）</span>
+        <span class="h5 amount mb-0"><%= number_with_delimiter(@dashboard.self_receivable_total) %>円</span>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="card card-summary p-3 h-100">
+        <span class="text-muted small">相手が請求している額（当月・承認済み）</span>
+        <span class="h5 amount mb-0"><%= number_with_delimiter(@dashboard.partner_receivable_total) %>円</span>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="card card-summary p-3 h-100">
+        <span class="text-muted small">自分の承認待ち件数</span>
+        <span class="h5 mb-0"><%= @dashboard.pending_for_me_count %>件</span>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="card card-summary p-3 h-100">
+        <span class="text-muted small">相手の承認待ち件数</span>
+        <span class="h5 mb-0"><%= @dashboard.pending_for_partner_count %>件</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card card-summary p-4 mb-4">
+    <h2 class="h6 mb-2">現時点の相殺結果</h2>
+    <% if @dashboard.settled_flat? %>
+      <p class="mb-0">差額はありません。</p>
+    <% else %>
+      <p class="mb-0 h5">
+        <%= @dashboard.payer_display_name %> が <%= @dashboard.payee_display_name %> へ
+        <span class="amount amount-negative"><%= number_with_delimiter(@dashboard.payment_amount) %>円</span>
+        支払います
+      </p>
+    <% end %>
+  </div>
+
+  <div class="row g-3 mb-4">
+    <div class="col-12 col-lg-6">
+      <div class="card card-summary p-4 h-100">
+        <h2 class="h6 mb-3">最近の請求</h2>
+        <table class="table table-sm mb-0">
+          <tbody>
+          <% @dashboard.recent_claims.each do |c| %>
+            <tr style="cursor: pointer;" onclick="location.href='<%= claim_path(c) %>'">
+              <td><%= c.expense_date.strftime("%-m/%-d") %></td>
+              <td><%= c.claimant.display_name %> → <%= c.recipient.display_name %></td>
+              <td class="text-end amount"><%= number_with_delimiter(c.amount) %></td>
+              <td>
+                <span class="badge badge-status-<%= c.status %>">
+                  <%= { "pending" => "承認待ち", "approved" => "承認済み", "rejected" => "却下" }[c.status] %>
+                </span>
+              </td>
+            </tr>
+          <% end %>
+          <% if @dashboard.recent_claims.empty? %>
+            <tr><td class="text-muted text-center">請求はまだありません。</td></tr>
+          <% end %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="col-12 col-lg-6">
+      <div class="card card-summary p-4 h-100">
+        <h2 class="h6 mb-3">カテゴリ別金額（当月・承認済み）</h2>
+        <canvas id="categoryChart" height="220"></canvas>
+        <p class="text-muted text-center mb-0" id="categoryChartEmpty" style="display:none;">データがありません。</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<script>
+  const categoryLabels = <%= raw @dashboard.category_summary.map(&:first).to_json %>;
+  const categoryValues = <%= raw @dashboard.category_summary.map(&:last).to_json %>;
+
+  if (categoryLabels.length > 0) {
+    const ctx = document.getElementById("categoryChart").getContext("2d");
+    new Chart(ctx, {
+      type: "doughnut",
+      data: {
+        labels: categoryLabels,
+        datasets: [{
+          data: categoryValues,
+          backgroundColor: ["#0d6efd", "#20c997", "#ffc107", "#fd7e14", "#6f42c1", "#dc3545"]
+        }]
+      },
+      options: { responsive: true, plugins: { legend: { position: "bottom" } } }
+    });
+  } else {
+    document.getElementById("categoryChartEmpty").style.display = "block";
+  }
+</script>

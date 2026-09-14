@@ -1,0 +1,90 @@
+<% content_for :title, "請求履歴" %>
+<div class="container-app">
+  <h1 class="h4 mb-4">請求履歴</h1>
+
+  <%= form_with url: claims_path, method: :get, local: true, class: "row g-2 align-items-end mb-4" do %>
+    <div class="col-6 col-md-2">
+      <label class="form-label small">対象月</label>
+      <input type="month" name="year_month" class="form-control" value="<%= @year_month %>">
+    </div>
+    <div class="col-6 col-md-2">
+      <label class="form-label small">請求方向</label>
+      <select name="direction" class="form-select">
+        <option value="" <%= "selected" if @direction.blank? %>>すべて</option>
+        <option value="SENT" <%= "selected" if @direction == "SENT" %>>自分が請求</option>
+        <option value="RECEIVED" <%= "selected" if @direction == "RECEIVED" %>>自分宛て</option>
+      </select>
+    </div>
+    <div class="col-6 col-md-2">
+      <label class="form-label small">状態</label>
+      <select name="status" class="form-select">
+        <option value="" <%= "selected" if @status.blank? %>>すべて</option>
+        <option value="pending" <%= "selected" if @status == "pending" %>>承認待ち</option>
+        <option value="approved" <%= "selected" if @status == "approved" %>>承認済み</option>
+        <option value="rejected" <%= "selected" if @status == "rejected" %>>却下</option>
+      </select>
+    </div>
+    <div class="col-6 col-md-2">
+      <label class="form-label small">カテゴリ</label>
+      <select name="category_id" class="form-select">
+        <option value="">すべて</option>
+        <% @categories.each do |c| %>
+          <option value="<%= c.id %>" <%= "selected" if @category_id.to_s == c.id.to_s %>><%= c.category_name %></option>
+        <% end %>
+      </select>
+    </div>
+    <div class="col-12 col-md-2">
+      <button type="submit" class="btn btn-primary w-100">絞り込む</button>
+    </div>
+  <% end %>
+
+  <div class="table-responsive">
+    <table class="table align-middle bg-white">
+      <thead>
+      <tr>
+        <th>利用日</th>
+        <th>請求者</th>
+        <th>請求相手</th>
+        <th class="text-end">金額</th>
+        <th>カテゴリ</th>
+        <th>内容</th>
+        <th>状態</th>
+      </tr>
+      </thead>
+      <tbody>
+      <% @result.items.each do |c| %>
+        <tr style="cursor: pointer;" onclick="location.href='<%= claim_path(c) %>'">
+          <td><%= c.expense_date.strftime("%Y/%-m/%-d") %></td>
+          <td><%= c.claimant.display_name %></td>
+          <td><%= c.recipient.display_name %></td>
+          <td class="text-end amount"><%= number_with_delimiter(c.amount) %></td>
+          <td><%= c.category.category_name %></td>
+          <td><%= c.description %></td>
+          <td>
+            <span class="badge badge-status-<%= c.status %>">
+              <%= { "pending" => "承認待ち", "approved" => "承認済み", "rejected" => "却下" }[c.status] %>
+            </span>
+          </td>
+        </tr>
+      <% end %>
+      <% if @result.items.empty? %>
+        <tr><td colspan="7" class="text-center text-muted">該当する請求はありません。</td></tr>
+      <% end %>
+      </tbody>
+    </table>
+  </div>
+
+  <% if @result.total_pages > 1 %>
+    <nav aria-label="ページ">
+      <ul class="pagination">
+        <li class="page-item <%= "disabled" unless @result.has_previous? %>">
+          <%= link_to "前へ", claims_path(year_month: @year_month, direction: @direction, status: @status, category_id: @category_id, page: @result.page - 1), class: "page-link" %>
+        </li>
+        <li class="page-item disabled"><span class="page-link"><%= @result.page %> / <%= @result.total_pages %></span></li>
+        <li class="page-item <%= "disabled" unless @result.has_next? %>">
+          <%= link_to "次へ", claims_path(year_month: @year_month, direction: @direction, status: @status, category_id: @category_id, page: @result.page + 1), class: "page-link" %>
+        </li>
+      </ul>
+    </nav>
+  <% end %>
+</div>

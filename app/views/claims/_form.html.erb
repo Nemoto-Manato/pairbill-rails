@@ -1,0 +1,35 @@
+<% if claim.errors.any? %>
+  <div class="alert alert-danger">
+    <ul class="mb-0">
+      <% claim.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+    </ul>
+  </div>
+<% end %>
+
+<%= form_with model: claim, url: url, local: true do |f| %>
+  <div class="mb-3">
+    <label class="form-label">請求相手</label>
+    <input type="text" class="form-control" disabled value="<%= partner_name %>">
+    <%= f.hidden_field :recipient_id %>
+  </div>
+  <div class="mb-3">
+    <label for="claim_expense_date" class="form-label">利用日</label>
+    <%= f.date_field :expense_date, id: "claim_expense_date", class: "form-control" %>
+  </div>
+  <div class="mb-3">
+    <label for="claim_category_id" class="form-label">カテゴリ</label>
+    <%= f.collection_select :category_id, @categories, :id, :category_name,
+                             { include_blank: "選択してください" }, { id: "claim_category_id", class: "form-select" } %>
+  </div>
+  <div class="mb-3">
+    <label for="claim_amount" class="form-label">金額（円）</label>
+    <%= f.number_field :amount, id: "claim_amount", class: "form-control", min: 1, max: 9_999_999 %>
+  </div>
+  <div class="mb-3">
+    <label for="claim_description" class="form-label">内容・メモ</label>
+    <%= f.text_area :description, id: "claim_description", class: "form-control", rows: 3, maxlength: 100 %>
+  </div>
+  <%= f.submit submit_label, class: "btn btn-primary" %>
+<% end %>

@@ -1,0 +1,10 @@
+<% content_for :title, "請求編集" %>
+<div class="container-app" style="max-width: 640px;">
+  <h1 class="h4 mb-4">請求を編集</h1>
+
+  <div class="card card-summary p-4">
+    <%= render "form", claim: @claim, url: claim_path(@claim),
+                        partner_name: @claim.recipient.display_name, submit_label: "更新する" %>
+    <a href="<%= claim_path(@claim) %>" class="btn btn-outline-secondary mt-2">キャンセル</a>
+  </div>
+</div>

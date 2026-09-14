@@ -1,0 +1,13 @@
+<% content_for :title, "請求登録" %>
+<div class="container-app" style="max-width: 640px;">
+  <h1 class="h4 mb-4">請求を登録</h1>
+
+  <% if @partner.nil? %>
+    <div class="alert alert-danger">相手がまだペアに参加していないため、請求を登録できません。</div>
+  <% end %>
+
+  <div class="card card-summary p-4">
+    <%= render "form", claim: @claim, url: claims_path,
+                        partner_name: @partner&.display_name || "未参加", submit_label: "登録する" %>
+  </div>
+</div>

@@ -1,0 +1,33 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
+  <div class="container-app container-fluid">
+    <a class="navbar-brand" href="/dashboard">二人の請求帳</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="mainNav">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item"><a class="nav-link" href="/dashboard">ダッシュボード</a></li>
+        <li class="nav-item"><a class="nav-link" href="/claims/new">請求を登録</a></li>
+        <li class="nav-item"><a class="nav-link" href="/claims">請求履歴</a></li>
+        <li class="nav-item"><a class="nav-link" href="/settlements">月次精算</a></li>
+        <li class="nav-item">
+          <a class="nav-link" href="/notifications">
+            通知
+            <% if unread_notification_count.to_i > 0 %>
+              <span class="badge rounded-pill bg-danger"><%= unread_notification_count %></span>
+            <% end %>
+          </a>
+        </li>
+        <li class="nav-item"><a class="nav-link" href="/settings/profile">設定</a></li>
+      </ul>
+      <ul class="navbar-nav">
+        <li class="nav-item d-flex align-items-center me-3">
+          <span class="navbar-text text-white-50"><%= current_user.display_name %></span>
+        </li>
+        <li class="nav-item">
+          <%= button_to "ログアウト", logout_path, method: :delete, class: "btn btn-outline-light btn-sm" %>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>

@@ -1,0 +1,35 @@
+# MySQL（MAMP付属のMySQLに接続する想定）。
+#
+# 接続情報は環境変数で渡す。
+#   export DB_USERNAME=root
+#   export DB_PASSWORD=（MAMPのMySQLパスワード）
+#   export DB_PORT=（MAMPのMySQLポート。デフォルトは3306）
+#
+# Java版（pairbill）と同じMySQLサーバーを共有しても衝突しないよう、
+# データベース名は pairbill_rails_* にしている。
+default: &default
+  adapter: mysql2
+  encoding: utf8mb4
+  collation: utf8mb4_unicode_ci
+  max_connections: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+  username: <%= ENV.fetch("DB_USERNAME") { "root" } %>
+  password: <%= ENV.fetch("DB_PASSWORD") { "" } %>
+  host: <%= ENV.fetch("DB_HOST") { "127.0.0.1" } %>
+  port: <%= ENV.fetch("DB_PORT") { 3306 } %>
+
+development:
+  <<: *default
+  database: pairbill_rails_development
+
+# Warning: The database defined as "test" will be erased and
+# re-generated from your development database when you run "rake".
+# Do not set this db to the same as development or production.
+test:
+  <<: *default
+  database: pairbill_rails_test
+
+production:
+  <<: *default
+  database: pairbill_rails_production
+  username: <%= ENV.fetch("DB_USERNAME") { "root" } %>
+  password: <%= ENV["DB_PASSWORD"] %>

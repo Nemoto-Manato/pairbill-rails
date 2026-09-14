@@ -1,0 +1,22 @@
+<% content_for :title, "ログイン" %>
+<div class="d-flex align-items-center justify-content-center" style="min-height: 100vh;">
+  <div class="card card-summary p-4" style="width: 100%; max-width: 420px;">
+    <h1 class="h4 text-center mb-4">二人の請求帳</h1>
+
+    <%= form_with url: login_path, method: :post, local: true do |f| %>
+      <div class="mb-3">
+        <label for="email" class="form-label">メールアドレス</label>
+        <%= f.email_field :email, id: "email", class: "form-control", required: true, autofocus: true %>
+      </div>
+      <div class="mb-3">
+        <label for="password" class="form-label">パスワード</label>
+        <%= f.password_field :password, id: "password", class: "form-control", required: true %>
+      </div>
+      <%= f.submit "ログイン", class: "btn btn-primary w-100" %>
+    <% end %>
+
+    <p class="text-center mt-3 mb-0">
+      アカウントをお持ちでない方は <%= link_to "会員登録", signup_path %>
+    </p>
+  </div>
+</div>

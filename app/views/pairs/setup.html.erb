@@ -1,0 +1,27 @@
+<% content_for :title, "ペア設定" %>
+<div class="container-app" style="max-width: 640px;">
+  <h1 class="h4 mb-4">ペア設定</h1>
+
+  <div class="card card-summary p-4 mb-4">
+    <h2 class="h6 mb-3">新しいペアを作成する</h2>
+    <%= form_with url: "/pair", method: :post, local: true do |f| %>
+      <div class="mb-3">
+        <label for="pair_name" class="form-label">ペア名（任意。未入力の場合は「ふたりのグループ」）</label>
+        <%= f.text_field :pair_name, id: "pair_name", name: "pair_name", class: "form-control", maxlength: 50 %>
+      </div>
+      <%= f.submit "ペアを作成する", class: "btn btn-primary" %>
+    <% end %>
+  </div>
+
+  <div class="card card-summary p-4">
+    <h2 class="h6 mb-3">招待コードで参加する</h2>
+    <%= form_with url: "/pair/invitations/join", method: :post, local: true do |f| %>
+      <div class="mb-3">
+        <label for="invitation_code" class="form-label">招待コード（8文字）</label>
+        <%= f.text_field :invitation_code, id: "invitation_code", name: "invitation_code",
+                          class: "form-control text-uppercase", maxlength: 8 %>
+      </div>
+      <%= f.submit "このコードで参加する", class: "btn btn-outline-primary" %>
+    <% end %>
+  </div>
+</div>

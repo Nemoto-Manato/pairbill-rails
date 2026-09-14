@@ -1,0 +1,70 @@
+<% content_for :title, "請求詳細" %>
+<div class="container-app" style="max-width: 640px;">
+  <h1 class="h4 mb-4">請求詳細</h1>
+
+  <div class="card card-summary p-4 mb-4">
+    <dl class="row mb-0">
+      <dt class="col-4 col-sm-3">状態</dt>
+      <dd class="col-8 col-sm-9">
+        <span class="badge badge-status-<%= @claim.status %>">
+          <%= { "pending" => "承認待ち", "approved" => "承認済み", "rejected" => "却下" }[@claim.status] %>
+        </span>
+      </dd>
+
+      <dt class="col-4 col-sm-3">利用日</dt>
+      <dd class="col-8 col-sm-9"><%= @claim.expense_date.strftime("%Y年%-m月%-d日") %></dd>
+
+      <dt class="col-4 col-sm-3">請求者</dt>
+      <dd class="col-8 col-sm-9"><%= @claim.claimant.display_name %></dd>
+
+      <dt class="col-4 col-sm-3">請求相手</dt>
+      <dd class="col-8 col-sm-9"><%= @claim.recipient.display_name %></dd>
+
+      <dt class="col-4 col-sm-3">カテゴリ</dt>
+      <dd class="col-8 col-sm-9"><%= @claim.category.category_name %></dd>
+
+      <dt class="col-4 col-sm-3">金額</dt>
+      <dd class="col-8 col-sm-9 amount"><%= number_with_delimiter(@claim.amount) %>円</dd>
+
+      <dt class="col-4 col-sm-3">内容・メモ</dt>
+      <dd class="col-8 col-sm-9"><%= @claim.description %></dd>
+
+      <% if @claim.rejected? && @claim.rejection_reason.present? %>
+        <dt class="col-4 col-sm-3">却下理由</dt>
+        <dd class="col-8 col-sm-9"><%= @claim.rejection_reason %></dd>
+      <% end %>
+
+      <dt class="col-4 col-sm-3">登録日時</dt>
+      <dd class="col-8 col-sm-9"><%= @claim.created_at.strftime("%Y年%-m月%-d日 %H:%M") %></dd>
+    </dl>
+  </div>
+
+  <% if @claim.claimant_id == current_user.id && @claim.pending? %>
+    <div class="d-flex gap-2 flex-wrap mb-4">
+      <a href="<%= edit_claim_path(@claim) %>" class="btn btn-outline-primary">編集する</a>
+      <%= button_to "削除する", claim_path(@claim), method: :delete,
+                     data: { turbo_confirm: "この請求を削除します。よろしいですか？" },
+                     class: "btn btn-outline-danger" %>
+    </div>
+  <% end %>
+
+  <% if @claim.recipient_id == current_user.id && @claim.pending? %>
+    <div class="card card-summary p-4">
+      <h2 class="h6 mb-3">承認・却下</h2>
+      <%= button_to "承認する", approve_claim_path(@claim), method: :post,
+                     data: { turbo_confirm: "承認後は取り消せません。承認しますか？" },
+                     class: "btn btn-success mb-3" %>
+      <%= form_with url: reject_claim_path(@claim), method: :post, local: true,
+                     data: { turbo_confirm: "この請求を却下します。よろしいですか？" } do |f| %>
+        <div class="mb-2">
+          <label for="rejection_reason" class="form-label">却下理由（任意）</label>
+          <%= f.text_field :rejection_reason, id: "rejection_reason", name: "rejection_reason",
+                            class: "form-control", maxlength: 100 %>
+        </div>
+        <%= f.submit "却下する", class: "btn btn-outline-danger" %>
+      <% end %>
+    </div>
+  <% end %>
+
+  <a href="/claims" class="btn btn-link mt-3">一覧へ戻る</a>
+</div>

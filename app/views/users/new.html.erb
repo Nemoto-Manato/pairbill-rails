@@ -1,0 +1,40 @@
+<% content_for :title, "会員登録" %>
+<div class="d-flex align-items-center justify-content-center" style="min-height: 100vh;">
+  <div class="card card-summary p-4" style="width: 100%; max-width: 420px;">
+    <h1 class="h4 text-center mb-4">会員登録</h1>
+
+    <% if @user.errors.any? %>
+      <div class="alert alert-danger">
+        <ul class="mb-0">
+          <% @user.errors.full_messages.each do |message| %>
+            <li><%= message %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <%= form_with model: @user, url: signup_path, scope: :user, local: true do |f| %>
+      <div class="mb-3">
+        <label for="user_display_name" class="form-label">表示名</label>
+        <%= f.text_field :display_name, id: "user_display_name", class: "form-control", maxlength: 50 %>
+      </div>
+      <div class="mb-3">
+        <label for="user_email" class="form-label">メールアドレス</label>
+        <%= f.email_field :email, id: "user_email", class: "form-control" %>
+      </div>
+      <div class="mb-3">
+        <label for="user_password" class="form-label">パスワード（8〜72文字）</label>
+        <%= f.password_field :password, id: "user_password", class: "form-control" %>
+      </div>
+      <div class="mb-3">
+        <label for="user_password_confirmation" class="form-label">確認用パスワード</label>
+        <%= f.password_field :password_confirmation, id: "user_password_confirmation", class: "form-control" %>
+      </div>
+      <%= f.submit "登録する", class: "btn btn-primary w-100" %>
+    <% end %>
+
+    <p class="text-center mt-3 mb-0">
+      既にアカウントをお持ちの方は <%= link_to "ログイン", login_path %>
+    </p>
+  </div>
+</div>

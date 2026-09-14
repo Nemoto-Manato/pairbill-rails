@@ -1,0 +1,23 @@
+<% content_for :title, "通知一覧" %>
+<div class="container-app" style="max-width: 640px;">
+  <h1 class="h4 mb-4">通知一覧</h1>
+
+  <div class="list-group">
+    <% @notifications.each do |n| %>
+      <%= button_to read_notification_path(n), method: :post,
+                     class: "list-group-item list-group-item-action p-0 w-100 text-start border-0 #{'notification-unread' unless n.read?}" do %>
+        <div class="p-3">
+          <div class="d-flex justify-content-between">
+            <strong><%= n.title %></strong>
+            <% unless n.read? %><span class="badge bg-danger">未読</span><% end %>
+          </div>
+          <div class="text-muted small"><%= n.message %></div>
+          <div class="text-muted small"><%= n.created_at.strftime("%Y年%-m月%-d日 %H:%M") %></div>
+        </div>
+      <% end %>
+    <% end %>
+    <% if @notifications.empty? %>
+      <p class="text-muted text-center py-4">通知はありません。</p>
+    <% end %>
+  </div>
+</div>

@@ -1,0 +1,61 @@
+<% content_for :title, "招待管理" %>
+<div class="container-app" style="max-width: 720px;">
+  <h1 class="h4 mb-4">招待管理</h1>
+
+  <div class="card card-summary p-4 mb-4">
+    <h2 class="h6 mb-2"><%= @pair.pair_name %></h2>
+    <p class="mb-0">
+      登録者2：
+      <% if @partner %>
+        <%= @partner.display_name %>
+      <% else %>
+        <span class="text-muted">未参加</span>
+      <% end %>
+    </p>
+  </div>
+
+  <% if @can_issue %>
+    <div class="card card-summary p-4 mb-4">
+      <h2 class="h6 mb-3">招待コードを発行する</h2>
+      <p class="text-muted small">発行から24時間有効です。相手にコードを伝えてください。</p>
+      <%= form_with url: "/pair/invitations", method: :post, local: true do |f| %>
+        <%= f.submit "招待コードを発行する", class: "btn btn-primary" %>
+      <% end %>
+    </div>
+  <% else %>
+    <div class="alert alert-info">ペアは既に2人参加しているため、招待コードは発行できません。</div>
+  <% end %>
+
+  <div class="card card-summary p-4">
+    <h2 class="h6 mb-3">発行済みの招待コード</h2>
+    <div class="table-responsive">
+      <table class="table align-middle">
+        <thead>
+        <tr>
+          <th>コード</th>
+          <th>状態</th>
+          <th>有効期限</th>
+          <th></th>
+        </tr>
+        </thead>
+        <tbody>
+        <% @invitations.each do |inv| %>
+          <tr>
+            <td><code><%= inv.invitation_code %></code></td>
+            <td><span class="badge badge-status-<%= inv.status %>"><%= inv.status %></span></td>
+            <td><%= inv.expires_at.strftime("%Y年%-m月%-d日 %H:%M") %></td>
+            <td>
+              <% if inv.active? && inv.issued_by == current_user.id %>
+                <%= button_to "取消", cancel_pair_invitation_path(inv), method: :post, class: "btn btn-sm btn-outline-secondary" %>
+              <% end %>
+            </td>
+          </tr>
+        <% end %>
+        <% if @invitations.empty? %>
+          <tr><td colspan="4" class="text-muted text-center">発行済みの招待コードはありません。</td></tr>
+        <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

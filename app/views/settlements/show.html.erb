@@ -1,0 +1,66 @@
+<% content_for :title, "月次精算確認" %>
+<div class="container-app" style="max-width: 640px;">
+  <h1 class="h4 mb-4"><%= @detail.year_month_label %> の精算</h1>
+
+  <div class="card card-summary p-4 mb-4">
+    <span class="badge mb-3 badge-status-<%= @detail.status %>" style="width: fit-content;"><%= @detail.status_label %></span>
+
+    <dl class="row mb-0">
+      <dt class="col-6">自分の請求合計（承認済み）</dt>
+      <dd class="col-6 text-end amount"><%= number_with_delimiter(@detail.self_receivable_total) %>円</dd>
+
+      <dt class="col-6">相手の請求合計（承認済み）</dt>
+      <dd class="col-6 text-end amount"><%= number_with_delimiter(@detail.partner_receivable_total) %>円</dd>
+
+      <dt class="col-6">対象請求件数</dt>
+      <dd class="col-6 text-end"><%= @detail.approved_claim_count %>件</dd>
+    </dl>
+
+    <hr>
+
+    <% if @detail.settled_flat? %>
+      <p class="mb-0">差額はありません。支払額は0円です。</p>
+    <% else %>
+      <p class="mb-0 h5">
+        <%= @detail.payer_display_name %> が <%= @detail.payee_display_name %> へ
+        <span class="amount amount-negative"><%= number_with_delimiter(@detail.payment_amount) %>円</span>
+        支払います
+      </p>
+    <% end %>
+  </div>
+
+  <% if @detail.status != "unsettled" %>
+    <div class="card card-summary p-4 mb-4">
+      <h2 class="h6 mb-3">経過</h2>
+      <% if @detail.requested_at %>
+        <p class="mb-1">申請者：<%= @detail.requested_by_display_name %>（<%= @detail.requested_at.strftime("%Y年%-m月%-d日 %H:%M") %>）</p>
+      <% end %>
+      <% if @detail.completed_at %>
+        <p class="mb-1">承認者：<%= @detail.approved_by_display_name %>（<%= @detail.completed_at.strftime("%Y年%-m月%-d日 %H:%M") %>）</p>
+      <% end %>
+      <% if @detail.cancelled_at %>
+        <p class="mb-0">取消日時：<%= @detail.cancelled_at.strftime("%Y年%-m月%-d日 %H:%M") %></p>
+      <% end %>
+    </div>
+  <% end %>
+
+  <% if @detail.can_request %>
+    <%= button_to "精算を申請する", request_settlement_path(@detail.year_month_value), method: :post,
+                   data: { turbo_confirm: "この月の精算を申請します。申請中は請求の登録・変更ができなくなります。よろしいですか？" },
+                   class: "btn btn-primary" %>
+  <% end %>
+
+  <% if @detail.can_approve %>
+    <%= button_to "精算を承認する", approve_settlement_path(@detail.settlement_id), method: :post,
+                   data: { turbo_confirm: "精算を承認します。承認後は取り消せません。よろしいですか？" },
+                   class: "btn btn-success" %>
+  <% end %>
+
+  <% if @detail.can_cancel %>
+    <%= button_to "申請を取り消す", cancel_settlement_path(@detail.settlement_id), method: :post,
+                   data: { turbo_confirm: "精算申請を取り消します。よろしいですか？" },
+                   class: "btn btn-outline-secondary" %>
+  <% end %>
+
+  <a href="/settlements" class="btn btn-link mt-3">一覧へ戻る</a>
+</div>

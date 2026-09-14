@@ -1,0 +1,62 @@
+body {
+    background-color: #f6f7fb;
+}
+
+.navbar-brand {
+    font-weight: 700;
+}
+
+.amount {
+    font-variant-numeric: tabular-nums;
+    font-weight: 700;
+}
+
+.amount-negative {
+    color: #dc3545;
+}
+
+.badge-status-PENDING, .badge-status-pending {
+    background-color: #ffc107;
+    color: #212529;
+}
+
+.badge-status-APPROVED, .badge-status-approved,
+.badge-status-COMPLETED, .badge-status-completed {
+    background-color: #198754;
+}
+
+.badge-status-REJECTED, .badge-status-rejected,
+.badge-status-CANCELLED, .badge-status-cancelled {
+    background-color: #6c757d;
+}
+
+.badge-status-PENDING_APPROVAL, .badge-status-pending_approval,
+.badge-status-UNSETTLED, .badge-status-unsettled {
+    background-color: #0dcaf0;
+    color: #212529;
+}
+
+.notification-unread {
+    background-color: #fff8e1;
+    font-weight: 600;
+}
+
+.card-summary {
+    border: none;
+    border-radius: 0.75rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.container-app {
+    max-width: 1140px;
+    margin: 0 auto;
+    padding-left: 1rem;
+    padding-right: 1rem;
+}
+
+@media (max-width: 576px) {
+    .container-app {
+        padding-left: 0.75rem;
+        padding-right: 0.75rem;
+    }
+}
