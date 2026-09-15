@@ -47,7 +47,27 @@ View(ERB)  … 画面表示
 - **アプリ内通知**：請求登録／承認／却下、精算申請／完了のタイミングで自動作成。未読件数をヘッダーに表示
 - **ユーザー設定**：表示名の変更
 
-## 4. セットアップ方法（MAMP + MySQL）
+## 4. 画面キャプチャ
+
+同じ仕様のJava版と画面は共通です。
+
+| ログイン | ダッシュボード |
+|---|---|
+| ![ログイン画面](docs/screenshots/login.png) | ![ダッシュボード](docs/screenshots/dashboard.png) |
+
+| 請求登録 | 請求履歴 |
+|---|---|
+| ![請求登録画面](docs/screenshots/claim_new.png) | ![請求履歴一覧](docs/screenshots/claims_list.png) |
+
+| 請求詳細（承認・却下） | 月次精算確認 |
+|---|---|
+| ![請求詳細画面](docs/screenshots/claim_detail.png) | ![月次精算確認画面](docs/screenshots/settlement.png) |
+
+| 通知一覧 |
+|---|
+| ![通知一覧](docs/screenshots/notifications.png) |
+
+## 5. セットアップ方法（MAMP + MySQL）
 
 ### 前提
 
@@ -92,7 +112,7 @@ RAILS_ENV=test bin/rails db:schema:load
 bin/rails test
 ```
 
-## 5. Java版との主な違い
+## 6. Java版との主な違い
 
 | 項目 | Java版 | Ruby版 |
 |---|---|---|
@@ -101,14 +121,14 @@ bin/rails test
 | 状態変更の検証 | Bean ValidationでPOSTのみ許可 | RESTfulルーティング（PATCH/DELETEを使用） |
 | ステータス値 | Javaのenum | Active Recordの`enum`（文字列カラムにマッピング） |
 
-## 6. 工夫した点
+## 7. 工夫した点
 
 - **不正な閲覧・更新の防止を最優先に設計**：Controllerのbefore_actionだけでなく、Service層でも所有者・ペアメンバーシップ・請求/精算の状態を必ず検証しています。
 - **同時実行に対する排他制御**：招待コードによるペア参加と精算申請は`Pair.lock.find`（`SELECT ... FOR UPDATE`）でペア行をロックし、2人を超える同時参加や二重精算申請を防止しています。
 - **精算のスナップショット化**：精算申請時点の請求合計・差額をDBへスナップショット保存し、精算完了後はその値のみを表示する設計にしています。
 - **実際のMySQLに対するエンドツーエンドの動作確認**：Minitestによる単体テストに加えて、実際にMySQLを起動し、会員登録からログイン・ペア作成・招待・請求登録・承認・ダッシュボード集計・精算申請・承認・ロック・通知まで一連の操作をHTTPリクエストで再現して検証しました。この過程でjson gemのバージョン不整合によるセッション処理の不具合を発見し、修正しています。
 
-## 7. ディレクトリ構成（抜粋）
+## 8. ディレクトリ構成（抜粋）
 
 ```
 app/controllers/  画面・APIの入口
@@ -120,6 +140,6 @@ db/migrate/       マイグレーション（テーブル定義）
 db/seeds.rb       カテゴリの初期データ
 ```
 
-## 8. MVP対象外（将来拡張）
+## 9. MVP対象外（将来拡張）
 
 承認後の取消申請、精算完了後の取消、レシート画像アップロード、メール／LINE／プッシュ通知、ペア解除・退会、3人以上のグループ、CSV/PDF出力などはMVPの対象外としています。
